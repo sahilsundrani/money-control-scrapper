@@ -85,6 +85,16 @@ class DriverManager:
                 return None, "Driver is not initialized."
         except Exception as e:
             return None, f"Error taking screenshot: {str(e)}"
+        
+    def get_page_source(self):
+        """Retrieve the page source (HTML) of the current web page."""
+        try:
+            if self.driver is not None:
+                return self.driver.page_source, "Page source retrieved successfully."
+            else:
+                return None, "Driver is not initialized."
+        except Exception as e:
+            return None, f"Error retrieving page source: {str(e)}"
 
     def quit_driver(self):
         if self.driver:
@@ -214,6 +224,27 @@ def get_screenshot():
         return jsonify({"error": message}), 400
     else:
         return jsonify({"error": message}), 500
+    
+@app.route('/api/get_html', methods=['GET'])
+def api_get_html():
+    try:
+        page_source, message = driver_manager.get_page_source()
+        if page_source is not None:
+            return jsonify({
+                "status": "success",
+                "html": page_source,
+                "message": message
+            })
+        else:
+            return jsonify({
+                "status": "error",
+                "message": message
+            }), 400
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": str(e)
+        }), 500
 
 @app.route('/api/analyse', methods=['GET'])
 def get_news_analysis():
